@@ -13,6 +13,10 @@ function getGame(channelId) {
   return games.get(channelId);
 }
 
+function deleteGame(channelId) {
+  games.delete(channelId);
+}
+
 function rollD6() {
   return Math.floor(Math.random() * 6) + 1;
 }
@@ -82,6 +86,7 @@ function resolveGame(game) {
 module.exports = {
   createGame,
   getGame,
+  deleteGame,
   addCOP,
   rollForPlayers,
   chooseForBot,
