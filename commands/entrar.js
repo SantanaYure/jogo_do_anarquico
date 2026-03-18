@@ -28,7 +28,7 @@ module.exports = {
       return interaction.reply({ content: "❌ Você não tem moedas suficientes.", ephemeral: true });
     }
 
-    game.jogadores.push({ id: interaction.user.id, dados: null, lei: null, caos: null });
+    game.jogadores.push({ id: interaction.user.id, user: interaction.user, dados: null, lei: null, caos: null });
 
     await interaction.reply(`✅ <@${interaction.user.id}> entrou no jogo! Jogadores: ${game.jogadores.length}`);
   }
