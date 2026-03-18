@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
@@ -39,22 +39,32 @@ client.on("interactionCreate", async interaction => {
     const { allChosen, resolveGame } = require("./game");
 
     if (allChosen(game)) {
+      await interaction.channel.send("🌀 O destino está sendo decidido...");
+      await new Promise(r => setTimeout(r, 1500));
+      await interaction.channel.send("⚖️ Lei e Caos entram em conflito...");
+      await new Promise(r => setTimeout(r, 1500));
+
       const resultado = resolveGame(game);
 
-      let msg = "🎲 **RESULTADOS:**\n";
+      let desc = "";
       game.jogadores.forEach(p => {
         const nome = p.isBot ? "COP (bot)" : p.user.username;
-        msg += `${nome} → Lei: ${p.lei} | Caos: ${p.caos}\n`;
+        desc += `${nome} → Lei: **${p.lei}** | Caos: **${p.caos}**\n`;
       });
 
       if (resultado.tipo === "todos_perdem") {
-        msg += "\n💀 Todos perderam!";
+        desc += "\n💀 Todos perderam!";
       } else {
         const nome = resultado.vencedor.isBot ? "COP (bot)" : resultado.vencedor.user.username;
-        msg += `\n🏆 Vencedor: **${nome}**`;
+        desc += `\n🏆 Vencedor: **${nome}**`;
       }
 
-      await interaction.channel.send(msg);
+      const resultadoEmbed = new EmbedBuilder()
+        .setTitle("🏆 Resultado Final")
+        .setDescription(desc)
+        .setColor("#FFD700");
+
+      await interaction.channel.send({ embeds: [resultadoEmbed] });
     }
 
     return;
