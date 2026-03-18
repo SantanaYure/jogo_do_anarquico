@@ -1,4 +1,5 @@
 const { getGame, rollForPlayers, chooseForBot } = require("../game");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 
 module.exports = {
   data: {
@@ -24,17 +25,24 @@ module.exports = {
 
       if (p.isBot) continue;
 
-      try {
-        await p.user.send(
-          `🎲 Seus dados: ${d1} e ${d2}\nEscolha com /escolher`
-        );
-      } catch (err) {
-        await interaction.channel.send(
-          `⚠️ ${p.user.username}, não consegui te mandar DM.\nAtive suas mensagens privadas!`
-        );
-      }
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`lei_${d1}_${p.id}`)
+          .setLabel(`Lei = ${d1}`)
+          .setStyle(ButtonStyle.Primary),
+
+        new ButtonBuilder()
+          .setCustomId(`lei_${d2}_${p.id}`)
+          .setLabel(`Lei = ${d2}`)
+          .setStyle(ButtonStyle.Secondary)
+      );
+
+      await interaction.channel.send({
+        content: `🎲 ${p.user.username}, seus dados: **${d1}** e **${d2}**\nEscolha sua Lei:`,
+        components: [row]
+      });
     }
 
-    await interaction.reply("📩 Dados enviados no privado!");
+    await interaction.reply("🎲 Dados lançados! Faça sua escolha acima.");
   }
 };
