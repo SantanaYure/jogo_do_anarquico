@@ -20,14 +20,19 @@ module.exports = {
     });
 
     for (const p of game.jogadores) {
+      const [d1, d2] = p.dados;
+
       if (p.isBot) continue;
 
-      const [d1, d2] = p.dados;
-      const user = await interaction.client.users.fetch(p.id);
-
-      await user.send(
-        `🎲 Seus dados: **${d1}** e **${d2}**\nUse \`/escolher lei:X caos:Y\``
-      );
+      try {
+        await p.user.send(
+          `🎲 Seus dados: ${d1} e ${d2}\nEscolha com /escolher`
+        );
+      } catch (err) {
+        await interaction.channel.send(
+          `⚠️ ${p.user.username}, não consegui te mandar DM.\nAtive suas mensagens privadas!`
+        );
+      }
     }
 
     await interaction.reply("📩 Dados enviados no privado!");
