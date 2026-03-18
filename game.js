@@ -64,23 +64,38 @@ function allChosen(game) {
 }
 
 function resolveGame(game) {
-  const caos1 = game.jogadores.filter(p => p.caos === 1);
+  const invertidos = [];
 
-  if (caos1.length > 1) {
-    return { tipo: "todos_perdem" };
-  }
+  // Agrupar jogadores pelo valor do Caos
+  const grupos = {};
+  game.jogadores.forEach(p => {
+    if (!grupos[p.caos]) grupos[p.caos] = [];
+    grupos[p.caos].push(p);
+  });
 
-  if (caos1.length === 1) {
-    // O único jogador que escolheu caos=1 vence pelo caminho do caos
-    return { tipo: "caos", vencedor: caos1[0] };
-  }
+  // Ímpar de jogadores com mesmo Caos → todos do grupo invertem
+  // Par → neutro, ninguém inverte
+  Object.values(grupos).forEach(grupo => {
+    if (grupo.length % 2 !== 0) {
+      grupo.forEach(p => {
+        invertidos.push({ id: p.id, valorCaos: p.caos, total: grupo.length });
+        [p.lei, p.caos] = [p.caos, p.lei];
+      });
+    }
+  });
 
-  // Nenhum escolheu caos=1: quem tiver maior lei vence
+  // Disputa pelo maior Caos (após inversões)
   const vencedor = game.jogadores.reduce((a, b) =>
-    a.lei > b.lei ? a : b
+    a.caos > b.caos ? a : b
   );
 
-  return { tipo: "lei", vencedor };
+  // Empate no Caos: todos perdem
+  const empatados = game.jogadores.filter(p => p.caos === vencedor.caos);
+  if (empatados.length > 1) {
+    return { tipo: "todos_perdem", invertidos };
+  }
+
+  return { tipo: "caos", vencedor, invertidos };
 }
 
 module.exports = {

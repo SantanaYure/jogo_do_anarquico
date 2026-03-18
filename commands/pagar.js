@@ -1,10 +1,10 @@
-const { getGame } = require("../game");
 const { transfer } = require("../economy");
+const { MASTER_ID } = require("../config");
 
 module.exports = {
   data: {
     name: "pagar",
-    description: "Pagar jogador (apenas o mestre da partida)",
+    description: "Pagar jogador (apenas o mestre)",
     options: [
       { name: "usuario", type: 6, description: "Jogador a receber", required: true },
       { name: "valor", type: 4, description: "Quantidade de moedas", required: true }
@@ -12,13 +12,7 @@ module.exports = {
   },
 
   async execute(interaction) {
-    const game = getGame(interaction.channelId);
-
-    if (!game) {
-      return interaction.reply({ content: "❌ Sem jogo ativo neste canal.", ephemeral: true });
-    }
-
-    if (interaction.user.id !== game.master) {
+    if (interaction.user.id !== MASTER_ID) {
       return interaction.reply({ content: "❌ Apenas o mestre pode usar isso.", ephemeral: true });
     }
 
@@ -29,7 +23,7 @@ module.exports = {
       return interaction.reply({ content: "❌ O valor deve ser maior que zero.", ephemeral: true });
     }
 
-    const ok = transfer(game.master, user.id, valor);
+    const ok = transfer(MASTER_ID, user.id, valor);
     if (!ok) {
       return interaction.reply({ content: "❌ Saldo insuficiente.", ephemeral: true });
     }

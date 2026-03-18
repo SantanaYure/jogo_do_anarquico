@@ -7,6 +7,7 @@ const client = new Client({
 
 client.once("clientReady", () => {
   console.log("Bot online!");
+  require("./economy").startDailyIncome();
 });
 
 client.on("interactionCreate", async interaction => {
@@ -48,6 +49,17 @@ client.on("interactionCreate", async interaction => {
       const resultado = resolveGame(game);
 
       let desc = "";
+
+      if (resultado.invertidos.length > 0) {
+        desc += "🔄 **Inversões:**\n";
+        resultado.invertidos.forEach(({ id, valorCaos, total }) => {
+          const p = game.jogadores.find(j => j.id === id);
+          const nome = p.isBot ? "COP (bot)" : p.user.username;
+          desc += `⚡ ${nome} — Caos ${valorCaos} (${total} jogador${total > 1 ? "es" : ""}, ímpar) → invertido!\n`;
+        });
+        desc += "\n";
+      }
+
       game.jogadores.forEach(p => {
         const nome = p.isBot ? "COP (bot)" : p.user.username;
         desc += `${nome} → Lei: **${p.lei}** | Caos: **${p.caos}**\n`;
@@ -57,7 +69,7 @@ client.on("interactionCreate", async interaction => {
         desc += "\n💀 Todos perderam!";
       } else {
         const nome = resultado.vencedor.isBot ? "COP (bot)" : resultado.vencedor.user.username;
-        desc += `\n🏆 Vencedor: **${nome}**`;
+        desc += `\n🏆 Vencedor: **${nome}** com Caos ${resultado.vencedor.caos}`;
       }
 
       const resultadoEmbed = new EmbedBuilder()

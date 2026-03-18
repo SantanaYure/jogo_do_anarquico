@@ -41,17 +41,27 @@ module.exports = {
         users[p.id] = await interaction.client.users.fetch(p.id);
       }
 
-      let msg = "🎲 **RESULTADOS:**\n";
+      let msg = "";
+
+      if (resultado.invertidos.length > 0) {
+        msg += "🔄 **INVERSÃO DE DADOS:**\n";
+        resultado.invertidos.forEach(({ id, valorCaos, total }) => {
+          msg += `⚡ ${users[id].username} — Caos ${valorCaos} (${total} jogador${total > 1 ? "es" : ""}, ímpar) → dados invertidos!\n`;
+        });
+        msg += "\n";
+      }
+
+      msg += "🎲 **RESULTADOS FINAIS:**\n";
       game.jogadores.forEach(p => {
         msg += `${users[p.id].username} → Lei: ${p.lei} | Caos: ${p.caos}\n`;
       });
 
       if (resultado.tipo === "todos_perdem") {
-        msg += "\n💀 Todos perderam! O caos absorveu tudo. 😈";
+        msg += "\n💀 Todos perderam! Empate no Caos — o caos absorveu tudo. 😈";
       } else {
         const premio = game.aposta * game.jogadores.length;
         addMoney(resultado.vencedor.id, premio);
-        msg += `\n🏆 Vencedor: **${users[resultado.vencedor.id].username}** (+${premio} moedas)`;
+        msg += `\n🏆 Vencedor: **${users[resultado.vencedor.id].username}** com Caos ${resultado.vencedor.caos} (+${premio} moedas)`;
       }
 
       await interaction.channel.send(msg);
