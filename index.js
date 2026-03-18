@@ -26,7 +26,8 @@ client.on("interactionCreate", async interaction => {
     const player = game.jogadores.find(p => p.id === playerId);
 
     const lei = Number(valor);
-    const caos = player.dados.find(d => d !== lei);
+    const idx = player.dados.indexOf(lei);
+    const caos = player.dados[idx === 0 ? 1 : 0];
 
     player.lei = lei;
     player.caos = caos;
